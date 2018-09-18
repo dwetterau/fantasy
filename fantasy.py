@@ -24,6 +24,35 @@ class Position(Enum):
     DEFENSE = 6
 
 
+class Source(Enum):
+    YAHOO = 1
+
+
+class PlayerStats(object):
+    name: str
+    position: Position
+    week: Week
+    points: float
+    real: bool
+    source: Source
+
+    def __init__(
+        self,
+        name: str,
+        position: Position,
+        week: Week,
+        points: float,
+        real: bool,
+        source: Source
+    ):
+        self.name = name
+        self.position = position
+        self.week = week
+        self.points = points
+        self.real = real
+        self.source = source
+
+
 class Player(object):
     name: str
     position: Position
@@ -55,18 +84,21 @@ class Player(object):
 
 class ProjectionSource(object):
 
-    def get_players(self, position: Position, week: Week) -> List[Player]:
+    def source(self) -> Source:
         raise NotImplemented
 
-    def players_all_weeks(self) -> List[Player]:
-        players_by_name = {}
-        for week in [Week(1), Week(2)]:
-            for position in Position:
-                players = self.get_players(position, week)
-                for p in players:
-                    if p.name in players_by_name:
-                        players_by_name[p.name].merge(p)
-                    else:
-                        players_by_name[p.name] = p
+    def get_players(self, position: Position, week: Week, real: bool) -> List[PlayerStats]:
+        raise NotImplemented
 
-        return list(players_by_name.values())
+    def players_all_weeks(self) -> List[PlayerStats]:
+        stats = []
+        real_weeks = [Week(x) for x in range(1, 4)]
+        proj_weeks = [Week(x) for x in range(1, 13)]
+
+        for position in Position:
+            for week in real_weeks:
+                stats.extend(self.get_players(position, week, real=True))
+            for week in proj_weeks:
+                stats.extend(self.get_players(position, week, real=False))
+
+        return stats

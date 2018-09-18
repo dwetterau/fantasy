@@ -2,11 +2,14 @@ from typing import List
 
 from bs4 import BeautifulSoup
 
-from fantasy import ProjectionSource, Player, Week, Position
+from fantasy import ProjectionSource, Week, Position, PlayerStats, Source
 from fetch import fetch
 
 
 class YahooProjectionSource(ProjectionSource):
+
+    def source(self):
+        return Source.YAHOO
 
     def _position_to_str(self, position: Position) -> str:
         if position == Position.QUARTERBACK:
@@ -37,12 +40,12 @@ class YahooProjectionSource(ProjectionSource):
             )
         )
 
-    def _get_players(self, position: Position, week: Week, proj: bool) -> List[Player]:
+    def get_players(self, position: Position, week: Week, real: bool) -> List[PlayerStats]:
         done = False
         page_num = 0
         players_to_return = []
         while not done:
-            page = fetch(self._fetch_url(position, week, proj=proj, page_num=page_num))
+            page = fetch(self._fetch_url(position, week, proj=not real, page_num=page_num))
             html = BeautifulSoup(page, "html.parser")
             players = html.select("div.ysf-player-name")
             scores = html.select("td.Selected")
@@ -60,24 +63,15 @@ class YahooProjectionSource(ProjectionSource):
                     done = True
                     break
 
-                p = Player(name, position)
-                if proj:
-                    p.projected_points[week] = points
-                else:
-                    p.actual_points[week] = points
+                p = PlayerStats(
+                    name=name,
+                    position=position,
+                    week=week,
+                    points=points,
+                    real=real,
+                    source=self.source(),
+                )
                 players_to_return.append(p)
             page_num += 1
 
         return players_to_return
-
-    def get_players(self, position: Position, week: Week) -> List[Player]:
-        proj = self._get_players(position, week, proj=True)
-        actual = self._get_players(position, week, proj=False)
-        players_by_name = {p.name: p for p in proj}
-        for p in actual:
-            existing = players_by_name.get(p.name)
-            if not existing:
-                players_by_name[p.name] = p
-                continue
-            existing.merge(p)
-        return list(players_by_name.values())
