@@ -26,9 +26,34 @@ class Position(Enum):
     KICKER = 5
     DEFENSE = 6
 
+    def to_short_str(self) -> str:
+        if self == Position.QUARTERBACK:
+            return "QB"
+        elif self == Position.RUNNING_BACK:
+            return "RB"
+        elif self == Position.WIDE_RECEIVER:
+            return "WR"
+        elif self == Position.TIGHT_END:
+            return "TE"
+        elif self == Position.KICKER:
+            return "K"
+        elif self == Position.DEFENSE:
+            return "DEF"
+        raise ValueError
+
+    @classmethod
+    def from_short_str(cls, short_str: str) -> 'Position':
+        upper = short_str.upper()
+        for position in Position:
+            if position.to_short_str() == upper:
+                return position
+
+        raise ValueError
+
 
 class Source(Enum):
     YAHOO = 1
+    ESPN = 2
 
 
 class PlayerStats(object):
@@ -106,7 +131,7 @@ class ProjectionSource(object):
     async def players_all_weeks(self) -> List[PlayerStats]:
         stats = []
         real_weeks = [Week(x) for x in range(1, 3)]
-        proj_weeks = [Week(x) for x in range(1, 13)]
+        proj_weeks = [Week(x) for x in range(1, 5)]
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             loop = asyncio.get_event_loop()

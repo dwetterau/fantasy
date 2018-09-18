@@ -8,5 +8,7 @@ def fetch(url: str):
         with closing(get(url, stream=True)) as resp:
             if resp.status_code == 200:
                 return resp.content
+            else:
+                print("Got non-200 status code {}".format(resp.status_code))
     except RequestException as e:
         print("Got error from URL {} {}".format(url, str(e)))

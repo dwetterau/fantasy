@@ -1,11 +1,17 @@
 import asyncio
 
-from yahoo import YahooProjectionSource
+from espn import ESPNProjectionSource
 
 
 async def main():
-    y = YahooProjectionSource()
-    stats = await y.players_all_weeks()
+    sources = [
+        # YahooProjectionSource(),
+        ESPNProjectionSource(),
+    ]
+    stats = []
+    for source in sources:
+        stats.extend(await source.players_all_weeks())
+
     print(",".join((
         "name",
         "position",
