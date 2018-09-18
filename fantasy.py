@@ -1,3 +1,6 @@
+import asyncio
+import concurrent.futures
+
 from enum import Enum
 from typing import Dict, List
 
@@ -52,6 +55,16 @@ class PlayerStats(object):
         self.real = real
         self.source = source
 
+    def to_csv(self) -> str:
+        return ",".join((
+            self.name,
+            self.position.name,
+            str(self.week.num),
+            str(self.points),
+            "real" if self.real else "proj",
+            self.source.name,
+        ))
+
 
 class Player(object):
     name: str
@@ -90,15 +103,32 @@ class ProjectionSource(object):
     def get_players(self, position: Position, week: Week, real: bool) -> List[PlayerStats]:
         raise NotImplemented
 
-    def players_all_weeks(self) -> List[PlayerStats]:
+    async def players_all_weeks(self) -> List[PlayerStats]:
         stats = []
-        real_weeks = [Week(x) for x in range(1, 4)]
+        real_weeks = [Week(x) for x in range(1, 3)]
         proj_weeks = [Week(x) for x in range(1, 13)]
 
-        for position in Position:
-            for week in real_weeks:
-                stats.extend(self.get_players(position, week, real=True))
-            for week in proj_weeks:
-                stats.extend(self.get_players(position, week, real=False))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            loop = asyncio.get_event_loop()
+            futures = []
+            for position in Position:
+                for week in real_weeks:
+                    futures.append(loop.run_in_executor(
+                        executor,
+                        self.get_players,
+                        position,
+                        week,
+                        True,
+                    ))
+                for week in proj_weeks:
+                    futures.append(loop.run_in_executor(
+                        executor,
+                        self.get_players,
+                        position,
+                        week,
+                        False,
+                    ))
+            for response in await asyncio.gather(*futures):
+                stats.extend(response)
 
         return stats

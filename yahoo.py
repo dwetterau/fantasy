@@ -50,6 +50,7 @@ class YahooProjectionSource(ProjectionSource):
             players = html.select("div.ysf-player-name")
             scores = html.select("td.Selected")
             assert len(players) == len(scores)
+            orig_len = len(players_to_return)
 
             for i, player in enumerate(players):
                 name = player.select("a")[0].text
@@ -73,5 +74,7 @@ class YahooProjectionSource(ProjectionSource):
                 )
                 players_to_return.append(p)
             page_num += 1
+            if len(players_to_return) == orig_len:
+                break
 
         return players_to_return
