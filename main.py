@@ -1,12 +1,15 @@
 import asyncio
 
 from espn import ESPNProjectionSource
+from fantasy_pros import FantasyProsProjectionSource
+from yahoo import YahooProjectionSource
 
 
 async def main():
     sources = [
         # YahooProjectionSource(),
         ESPNProjectionSource(),
+        FantasyProsProjectionSource(),
     ]
     stats = []
     for source in sources:

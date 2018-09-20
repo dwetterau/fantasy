@@ -54,6 +54,7 @@ class Position(Enum):
 class Source(Enum):
     YAHOO = 1
     ESPN = 2
+    FANTASY_PROS = 3
 
 
 class PlayerStats(object):
