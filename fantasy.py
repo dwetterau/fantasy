@@ -6,10 +6,18 @@ from typing import Dict, List
 
 
 class Week(object):
-    num: int
+    _num: int
+    is_draft: bool
 
-    def __init__(self, num: int):
-        self.num = num
+    @property
+    def num(self):
+        if self.is_draft:
+            return "draft"
+        return self._num
+
+    def __init__(self, num: int, is_draft: bool):
+        self._num = num
+        self.is_draft = is_draft
 
     def __str__(self) -> str:
         return "Week-{}".format(self.num)
@@ -48,6 +56,13 @@ class Position(Enum):
             if position.to_short_str() == upper:
                 return position
 
+        raise ValueError
+
+    @classmethod
+    def from_str(cls, s: str) -> 'Position':
+        for pos in Position:
+            if pos.name == s:
+                return pos
         raise ValueError
 
 
@@ -131,8 +146,8 @@ class ProjectionSource(object):
 
     async def players_all_weeks(self) -> List[PlayerStats]:
         stats = []
-        real_weeks = [Week(x) for x in range(1, 3)]
-        proj_weeks = [Week(x) for x in range(1, 5)]
+        real_weeks = [Week(x, False) for x in range(1, 3)]
+        proj_weeks = [Week(x, False) for x in range(1, 5)]
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             loop = asyncio.get_event_loop()
