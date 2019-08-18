@@ -112,12 +112,16 @@ class Player(object):
     position: Position
     projected_points: Dict[Week, float]
     actual_points: Dict[Week, float]
+    tier: int
+    rank: int
 
     def __init__(self, name: str, position: Position):
         self.name = name
         self.position = position
         self.projected_points = {}
         self.actual_points = {}
+        self.tier = 0
+        self.rank = 0
 
     def __str__(self) -> str:
         return "<Player {}-{} proj:{} actual:{}>".format(

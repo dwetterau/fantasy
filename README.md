@@ -1,4 +1,4 @@
-Simple fantasy football scraper
+Fantasy football tools
 =====
 
 ## Setup
@@ -8,7 +8,7 @@ $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
 
-## Usage
+## Scraper usage
 
 ```
 $ source env/bin/activate
@@ -23,6 +23,11 @@ parse args or whatever.
 ## Draft assistance
 Steps:
 1. Download the latest CSV of draft rankings from https://www.fantasypros.com/nfl/rankings/consensus-cheatsheets.php
-2. Be sure the `is_mock=False` for the real draft, and tweak roster positions as necessary
-3. Start running the drafted player exporting code from `draft_scrape.js` on the Yahoo! website's console.
-4. Start up `draft.py` and periodically update the state of the draft by pasting in new status.
+2. Put that in `./output/fantasy_pros_overall_rankings.csv`
+3. Be sure the `is_mock=False` for the real draft, and tweak roster and starting positions as necessary
+4. Start running the drafted player exporting code from `draft_scrape.js` on the Yahoo! website's console.
+5. Start up `draft.py` and periodically update the state of the draft by pasting in new status.
+
+Debugging:
+- If it errors when starting up, try truncating the overall rankings to avoid players that you're
+  not going to be drafting anyway.
