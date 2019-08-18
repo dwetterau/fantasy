@@ -1,4 +1,3 @@
-
 function scrape() {
     let elements = document.querySelectorAll("#ys-chat-msgs .ys-player");
     let ids = [];
@@ -11,8 +10,11 @@ function scrape() {
     return ids.toString();
 }
 
+let ids;
 setInterval(function () {
-    console.log(scrape());
+    // This should put it on the clipboard automatically.
+    ids = scrape();
+    console.log(ids);
 }, 5000);
 
 // code for getting the ids from yahoo

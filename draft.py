@@ -2,6 +2,33 @@ from fantasy import Player, Position, Week
 
 
 def main():
+    # THINGS TO TUNE
+    is_mock = True
+    draft_pos = 4
+    num_teams = 10
+    roster_spots = [
+        {Position.QUARTERBACK},
+        {Position.QUARTERBACK},
+        {Position.WIDE_RECEIVER},
+        {Position.WIDE_RECEIVER},
+        {Position.WIDE_RECEIVER},
+        {Position.RUNNING_BACK},
+        {Position.RUNNING_BACK},
+        {Position.TIGHT_END},
+        {Position.WIDE_RECEIVER, Position.RUNNING_BACK, Position.TIGHT_END},
+        {Position.DEFENSE},
+        {Position.KICKER},
+        set(Position),
+        set(Position),
+        set(Position),
+        set(Position),
+        set(Position),
+        set(Position),
+    ]
+    if is_mock:
+        roster_spots = [{Position.QUARTERBACK}] + roster_spots[3:]
+    # END THINGS TO TUNE
+
     f = open("./output/yahoo_ids.raw")
     id_to_player = {}
     name_to_id = {}
@@ -49,31 +76,6 @@ def main():
         assert p.position == pos
         p.tier = tier
         p.rank = rank
-
-    is_mock = True
-    draft_pos = 4
-    num_teams = 10
-    roster_spots = [
-        {Position.QUARTERBACK},
-        {Position.QUARTERBACK},
-        {Position.WIDE_RECEIVER},
-        {Position.WIDE_RECEIVER},
-        {Position.WIDE_RECEIVER},
-        {Position.RUNNING_BACK},
-        {Position.RUNNING_BACK},
-        {Position.TIGHT_END},
-        {Position.WIDE_RECEIVER, Position.RUNNING_BACK, Position.TIGHT_END},
-        {Position.DEFENSE},
-        {Position.KICKER},
-        set(Position),
-        set(Position),
-        set(Position),
-        set(Position),
-        set(Position),
-        set(Position),
-    ]
-    if is_mock:
-        roster_spots = [{Position.QUARTERBACK}] + roster_spots[3:]
 
     already_drafted_set = set()
     my_roster = [None for _ in range(len(roster_spots))]
@@ -146,10 +148,10 @@ def print_top_n_left(positions, already_drafted, id_to_player, n=10):
         to_sort.append((i, player))
     s = sorted(to_sort, key=lambda p: p[1].rank)
     printed = 0
-    for idx, (i, p) in enumerate(s):
+    for (i, p) in s:
         if i in already_drafted:
             continue
-        print("{}: {} - {}".format(idx + 1, p.name, p.position.to_short_str()))
+        print("{}-{}: {} - {}".format(p.rank, p.tier, p.name, p.position.to_short_str()))
         printed += 1
         if printed == n:
             break
@@ -203,12 +205,12 @@ ID_TO_DEFENSES = {
     "100025": "San Francisco",
     "100021": "Philadelphia",
     "100023": "Pittsburgh",
-    "100012": "Kansas: City",
+    "100012": "Kansas City",
     "100010": "Tennessee",
     "100029": "Carolina",
-    "100020": "New: York",
+    "100020": "New York",
     "100001": "Atlanta",
-    "100009": "Green: Bay",
+    "100009": "Green Bay",
     "100022": "Arizona",
     "100008": "Detroit",
     "100028": "Washington",
