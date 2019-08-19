@@ -22,9 +22,13 @@ parse args or whatever.
 
 ## Draft assistance
 Steps:
-1. Download the latest CSV of draft rankings from https://www.fantasypros.com/nfl/rankings/consensus-cheatsheets.php
-2. Put that in `./output/fantasy_pros_overall_rankings.csv`
-3. Be sure the `is_mock=False` for the real draft, and tweak roster and starting positions as necessary
+0. Use the function in `draft_scrape.js` to pull in all the ids for players and put them in `./output/yahoo_ids.raw`.
+1. Download the latest CSV of draft rankings from [here](https://www.fantasypros.com/nfl/rankings/consensus-cheatsheets.php). 
+   Alternatively, start a [mock draft](https://draftwizard.fantasypros.com/football/mock-draft-simulator/settings/) with
+   the settings you prefer, and use `copy(scrapeCheatSheet())` to write your CSV.
+2. Put that in `./output/fantasy_pros_overall_rankings.csv`. If you used a custom ranking, use 
+   `./output/fantasy_pros_custom_overall_rankings.csv` instead.
+3. Be sure the `is_mock=False` for the real draft, and tweak roster and starting positions as necessary.
 4. Start running the drafted player exporting code from `draft_scrape.js` on the Yahoo! website's console.
 5. Start up `draft.py` and periodically update the state of the draft by pasting in new status.
 

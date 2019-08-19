@@ -17,6 +17,18 @@ setInterval(function () {
     console.log(ids);
 }, 5000);
 
+// code for scraping a custom ranking from a draft simulation
+function scrapeCheatSheet() {
+    let elements = document.querySelectorAll("#csDetails0 .CheatSheetPlayerName");
+    let out = "";
+    elements.forEach((e) => {
+        let name = e.parentElement.children[0].innerText;
+        let position = e.parentElement.children[1].innerText.split(" - ")[0];
+        out += `${name},${position}\r`
+    });
+    return out;
+}
+
 // code for getting the ids from yahoo
 function scrapePlayers() {
     let players = document.querySelectorAll(".ysf-player-name");

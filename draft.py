@@ -3,7 +3,8 @@ from fantasy import Player, Position, Week
 
 def main():
     # THINGS TO TUNE
-    is_mock = True
+    custom_rankings_source = True
+    is_mock = False
     draft_pos = 4
     num_teams = 10
     roster_spots = [
@@ -49,33 +50,52 @@ def main():
         id_to_player[i] = p
 
     # Load up the rankings for each player.
-    f = open("./output/fantasy_pros_overall_rankings.csv")
-    first = True
-    for line in f.readlines():
-        if first:
-            first = False
-            continue
+    if custom_rankings_source:
+        f = open("./output/fantasy_pros_custom_overall_rankings.csv")
+        for i, line in enumerate(f.readlines()):
+            cols = line.strip().split(",")
+            tier = (i // num_teams) + 1
+            rank = i + 1
+            pos_str = cols[1]
+            if pos_str == "DST":
+                pos_str = "DEF"
+            pos = Position.from_short_str(pos_str)
+            name = rewrite_name_for_yahoo(cols[0], name_to_id)
+            i = name_to_id[name.lower()]
 
-        cols = line.strip().split(",")
-        tier = int(cols[1][1:-1])
-        rank = int(cols[0][1:-1])
+            p = id_to_player[i]
+            assert p.position == pos
+            p.tier = tier
+            p.rank = rank
+    else:
+        f = open("./output/fantasy_pros_overall_rankings.csv")
+        first = True
+        for line in f.readlines():
+            if first:
+                first = False
+                continue
 
-        raw_pos = cols[5][1:-1]
-        pos_str = raw_pos[:2]
-        if raw_pos.startswith("DST"):
-            pos_str = "DEF"
-        elif raw_pos.startswith("K"):
-            pos_str = "K"
-        pos = Position.from_short_str(pos_str)
-        name = cols[3][1:-1]
+            cols = line.strip().split(",")
+            tier = int(cols[1][1:-1])
+            rank = int(cols[0][1:-1])
 
-        name = rewrite_name_for_yahoo(name, name_to_id)
-        i = name_to_id[name.lower()]
+            raw_pos = cols[5][1:-1]
+            pos_str = raw_pos[:2]
+            if raw_pos.startswith("DST"):
+                pos_str = "DEF"
+            elif raw_pos.startswith("K"):
+                pos_str = "K"
+            pos = Position.from_short_str(pos_str)
+            name = cols[3][1:-1]
 
-        p = id_to_player[i]
-        assert p.position == pos
-        p.tier = tier
-        p.rank = rank
+            name = rewrite_name_for_yahoo(name, name_to_id)
+            i = name_to_id[name.lower()]
+
+            p = id_to_player[i]
+            assert p.position == pos
+            p.tier = tier
+            p.rank = rank
+    f.close()
 
     already_drafted_set = set()
     my_roster = [None for _ in range(len(roster_spots))]
@@ -151,7 +171,7 @@ def print_top_n_left(positions, already_drafted, id_to_player, n=10):
     for (i, p) in s:
         if i in already_drafted:
             continue
-        print("{}-{}: {} - {}".format(p.rank, p.tier, p.name, p.position.to_short_str()))
+        print("{}-{}: {} - {}".format(p.tier, p.rank, p.name, p.position.to_short_str()))
         printed += 1
         if printed == n:
             break
@@ -177,6 +197,8 @@ def rewrite_name_for_yahoo(name: str, name_to_id) -> str:
         return "DK Metcalf"
     if name == "Steven Hauschka":
         return "Stephen Hauschka"
+    if name == "M. Valdes-scantling":
+        return "Marquez Valdes-Scantling"
     for n in name_to_id:
         if n.startswith(name.lower()):
             return n
@@ -188,11 +210,11 @@ def rewrite_name_for_yahoo(name: str, name_to_id) -> str:
 
 ID_TO_DEFENSES = {
     "100003": "Chicago",
-    "100014": "Los Angeles",
+    "100024": "LA Chargers",
     "100030": "Jacksonville",
     "100016": "Minnesota",
     "100033": "Baltimore",
-    "100024": "Los Angeles",
+    "100014": "Los Angeles",
     "100005": "Cleveland",
     "100034": "Houston",
     "100018": "New Orleans",
